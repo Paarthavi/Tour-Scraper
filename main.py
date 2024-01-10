@@ -2,6 +2,8 @@
 import requests
 # selectorlib will only particular information from all that source code
 import selectorlib
+import smtplib, ssl
+import os
 
 URL = "https://programmer100.pythonanywhere.com/tours/"
 HEADERS = {
@@ -20,7 +22,19 @@ def extract(source):
 	return value
 
 
-def send_email():
+def send_email(message):
+	host = "smtp.gmail.com"
+	port = 465
+
+	username = os.getenv("USER_ID")
+	password = os.getenv("PASSWORD")
+
+	receiver = os.getenv("USER_ID")
+	context = ssl.create_default_context()
+
+	with smtplib.SMTP_SSL(host, port, context=context) as server:
+		server.login(username, password)
+		server.sendmail(username, receiver, message)
 	print("Email was sent")
 
 
@@ -42,4 +56,4 @@ if __name__ == "__main__":
 	if extracted != "No upcoming tours":
 		if extracted not in content:
 			store(extracted)
-			send_email()
+			send_email(message="Hey, new event was found!")
